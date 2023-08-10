@@ -32,6 +32,17 @@ class InputProcessor:
             if key_event.mod & pygame.KMOD_RMETA:
                 return "RMeta"
 
+    def alt_get_mod_key(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            print("K_UP")
+        if keys[pygame.K_DOWN]:
+            print("K_DOWN")
+        if keys[pygame.K_LEFT]:
+            print("K_LEFT")
+        if keys[pygame.K_RIGHT]:
+            print("K_RIGHT")
+
     def __str__(self) -> str:
         str = f"""
         Mouse:
@@ -90,8 +101,8 @@ while running:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            print(event)
             input_hud.new_key_event(event)
+            input_hud.alt_get_mod_key()
 
     draw_fps(screen)
 
