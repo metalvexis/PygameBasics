@@ -11,7 +11,9 @@ BG_COLOR = (255, 255, 255)
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SCREEN = pygame.display.set_mode((1280, 720), flags=SRCALPHA)
-SCREEN.fill(BG_COLOR)
+PAPER = pygame.Surface(size=(SCREEN_WIDTH, SCREEN_HEIGHT), flags=SRCALPHA)
+PAPER.fill(BG_COLOR)
+SCREEN.blit(PAPER, (0, 0))
 CLOCK = pygame.time.Clock()
 FONT = pygame.font.SysFont("Arial", 12)
 RUNNING = True
@@ -35,11 +37,11 @@ def draw_board(
     col=10,
     cell_width=20,
     cell_height=20,
-    color: Color = (255, 255, 255),
+    color: Color = (255, 255, 255, 255),
 ) -> pygame.Surface:
     board_w = col * cell_width
     board_h = row * cell_height
-    board_surface = pygame.Surface(size=(board_w, board_h))
+    board_surface = pygame.Surface(size=(board_w, board_h), flags=SRCALPHA)
     board_surface.fill(BG_COLOR)
     for x in range(col):
         for y in range(row):
@@ -50,16 +52,22 @@ def draw_board(
 
 
 def main():
-    board_row = 5
-    board_col = 7
+    board_alpha = 255 / 2
+    board_row = 40
+    board_col = 50
 
     while RUNNING:
+        PAPER.fill(BG_COLOR)
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYUP:
-                SCREEN.fill(BG_COLOR)
+                if event.key == pygame.K_KP_MINUS:
+                    board_alpha = (board_alpha - 50) if board_alpha - 50 > 0 else 255
+                if event.key == pygame.K_KP_PLUS:
+                    board_alpha = (board_alpha + 50) if board_alpha + 50 < 255 else 255
                 if event.key == pygame.K_PAGEUP:
                     board_row += 1
                     board_col += 1
@@ -67,11 +75,19 @@ def main():
                     board_row -= 1 if board_row - 1 > 0 else 0
                     board_col -= 1 if board_col - 1 > 0 else 0
 
-        hud_debug(SCREEN)
+        hud_debug(PAPER)
 
-        board = draw_board(row=board_row, col=board_col, color=(0, 0, 0))
-        SCREEN.blit(board, ((SCREEN_WIDTH / 2) - (board.get_width() / 2), 50))
+        board = draw_board(
+            board_row,
+            board_col,
+            cell_width=15,
+            cell_height=15,
+            color=(0, 0, 0, board_alpha),
+        )
 
+        PAPER.blit(board, ((SCREEN_WIDTH / 2) - (board.get_width() / 2), 50))
+
+        SCREEN.blit(PAPER, (0, 0))
         CLOCK.tick(MAX_FPS)
 
         pygame.display.update()
