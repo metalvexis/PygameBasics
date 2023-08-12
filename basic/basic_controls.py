@@ -2,8 +2,6 @@ import pygame
 from pygame.locals import *
 import sys
 
-pygame
-
 pygame.init()
 WINDOW_TITLE = "Basic Controls"
 MAX_FPS = 120
