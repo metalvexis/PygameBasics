@@ -25,7 +25,7 @@ class Event_Handler:
         Event_Handler.targets.setdefault(type, []).append(fn)
 
     # Notify all functions that are registered to the event type
-    def notify(self, event):
+    def notify_event(self, event):
         fnl = (
             Event_Handler.targets[event.type]
             if event.type in Event_Handler.targets
@@ -36,6 +36,7 @@ class Event_Handler:
 
 
 def onExit(event):
+    print("Exit")
     pygame.quit()
     sys.exit()
 
@@ -48,7 +49,7 @@ class Controllable:
         self.e_handler.register(pygame.KEYDOWN, self.move)
 
     def notify_event(self, event):
-        self.e_handler.notify(event)
+        self.e_handler.notify_event(event)
 
     def move(self, event):
         pass
@@ -64,22 +65,17 @@ class Person(Controllable):
         print("Person moved")
 
 
-handler = Event_Handler()
+main_handler = Event_Handler()
 car1 = Car()
 person1 = Person()
 
 
 def main():
-    handler.register(pygame.QUIT, onExit)
+    main_handler.register(pygame.QUIT, onExit)
     while RUNNING:
         for event in pygame.event.get():
-            handler.notify(event)
-            car1.notify_event(event)
-            person1.notify_event(event)
-
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+            for handler in [main_handler, car1, person1]:
+                handler.notify_event(event)
         PAPER.fill(BG_COLOR)
         SCREEN.blit(PAPER, (0, 0))
         CLOCK.tick(MAX_FPS)
